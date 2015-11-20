@@ -1,0 +1,18 @@
+{% extends "master.html" %}
+{% set active_page = "index" %}
+
+{% block head %}
+	{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+<h1 class="text-center"> NAME </h1>
+
+<form>
+	<input class="form-control form-control-lg" type="text" placeholder="Enter a question">
+</form>
+
+</div>
+{% endblock %}
