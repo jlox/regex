@@ -1,6 +1,18 @@
 from bs4 import BeautifulSoup
-import re
+import re, urllib2, google
 
+def format():
+    q = #input
+    pages = google.search(q,num=10,start=0,stop=10)
+    plist = []
+    for r in pages:
+        plist.append(r)
+    url=urllib2.urlopen(plist[0])
+    page = url.read().decode('ascii')
+    soup = BeautifulSoup(page)
+    raw = soup.get_text(page)
+    text = re.sub("[\t\n ]+",' ',raw)
+    
 def search(url):
     soupbase = BeautifulSoup(url)
     soup = str(soup)
