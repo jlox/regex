@@ -20,8 +20,8 @@ def getText(link):
 	page = html.decode('utf8')
 	soup = BeautifulSoup(page, 'html.parser').body
 	raw = soup.get_text(page)
-	text = re.sub("[\t\n ]+",' ',raw)
-	return text
+	#text = re.sub("[\t\n ]+",' ',raw)
+	return raw
 
 def countListItems(L, dict):
 	"""
@@ -92,13 +92,15 @@ def findNames(text):
 	"""
 	pattern = "[A-Z]\w+[ ][A-Z]\w+"  # 2 capitalized words together
 	result = re.findall(pattern, text)
-	num = len(result)
-	for i in range(num):
-		name = result[i]
-		if "The " == name[0:4] or "A " == name[0:2] or "An " == name[0:3]:
-			result.pop(i)
-			num -= 1
+	#num = len(result)
+	#for i in range(num):
+		#name = result[i]
+		#if "The " == name[0:4] or "A " == name[0:2] or "An " == name[0:3]:
+			#result.pop(i)
+			#num -= 1
 	return result
+
+answer('who sings adele')
 
 if __name__=="__main__":
 	import doctest
