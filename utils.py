@@ -5,48 +5,45 @@ def findPages(q, numPages=10):
 	"""
 	Returns a list of pages related to query string by Google search.
 	"""
-	pages = google.search(q,num=numPages,start=0,stop=numPages)
+	pages = google.search(q,num=10,start=0,stop=numPages)
 	plist = []
 	for r in pages:
 		plist.append(r)
-	return plist
+	return plist[:numPages]
 
 def getText(link):
 	"""
 	Returns a string of text extracted from a webpage.
 	"""
-	print "LINK -- "+link
-	url = urllib2.urlopen(link)  # page is plist[i]
+	try: 
+		url = urllib2.urlopen(link)  # page is plist[i]
+	except URLError as e:
+		print "URL Error({0}): {1}".format(e.errno, e.strerror)
 	html = url.read() 
 	page = html.decode('utf8')
-	soup = BeautifulSoup(page, 'html.parser').body
+	soup = BeautifulSoup(page, "html.parser").body
 	raw = soup.get_text(page)
 	#text = re.sub("[\t\n ]+",' ',raw)
 	return raw
 
-def countListItems(L, dict):
+def countListItems(L, dicts):
 	"""
-	Returns a dictionary of list items and how many times they appear in the list.
-
-	>>> countListItems(["cat", "dog", "bird", "cat", "bird"], {})
-	{'bird': 2, 'dog': 1, 'cat': 2}
-
-	>>> countListItems(["blue", "green"], {"black": 2, "blue": 1})
-	{'blue': 2, 'green': 1, 'black': 2}
+	Returns a list of dictionaries of list items and how many times they appear in the list.
 	"""
 	for i in L:
-		if i in dict.keys():
-			dict[i] += 1
+		ind = ord(i[0].upper()) - 65  
+		if i in dicts[ind].keys():
+			dicts[ind][i] += 1
 		else:
-			dict[i] = 1
-	return dict
+			dicts[ind][i] = 1
+	return dicts
 
 def maxCountItem(dict):
 	"""
 	Returns dictionary item with greatest count.
 
 	>>> maxCountItem({'john': 3, 'sally': 10, 'jack': 4})
-	'sally'
+	['sally', 10]
 	"""
 	maxCount = 0
 	maxItem = ""
@@ -54,6 +51,17 @@ def maxCountItem(dict):
 		if dict[i] > maxCount:
 			maxItem = i
 			maxCount = dict[i]
+	return [maxItem, maxCount]
+
+def maxCountList(dicts):
+	maxCount = 0
+	maxItem = ""
+	for d in dicts:
+		if d != {}:
+			mc = maxCountItem(d)
+			if mc[1] > maxCount:
+				maxItem = mc[0]
+				maxCount = mc[1]
 	return maxItem
 
 #something that determines what we need to find (person, place, etc)
@@ -62,19 +70,36 @@ def answer(q):
 	Returns an answer to a string query.
 	"""
 	pages = findPages(q, 5)
-	print "found pages"
-	a = {}
+	total = len(pages)
+	a = [{} for i in range(26)]
 	if 'who' in q.lower():
+		pnum = 1
 		for p in pages:
+			print "("+str(pnum)+"/"+str(total)+") "+p
 			text = getText(p)
-			print "got text"
 			countListItems(findNames(text), a) 
-			print "items counted"
-			print "done"
-		ans = maxCountItem(a) 
+			pnum += 1
+		ans = maxCountList(a) 
 		print ans
 		return ans
 	return ""
+
+def isValid(check, stopWords):
+	"""
+	>>> isValid("The Amazing", ["a", "an", "the"])
+	False
+	"""
+	parts = [i.lower() for i in check.split(" ")]
+	for p in parts:
+		if p in stopWords:
+			return False
+	return True
+
+def loadStopWords():
+	file = "stopWords.txt"
+	f = open(file)
+	words = [line.strip() for line in f]
+	return words
 
 ############ Find a person. ############
 
@@ -90,16 +115,15 @@ def findNames(text):
 	"""
 	pattern = "[A-Z]\w+[ ][A-Z]\w+"  # 2 capitalized words together
 	result = re.findall(pattern, text)
-	#num = len(result)
-	#for i in range(num):
-		#name = result[i]
-		#if "The " == name[0:4] or "A " == name[0:2] or "An " == name[0:3]:
-			#result.pop(i)
-			#num -= 1
-	return result
-
-answer('who plays blair waldorf in gossip girl')
+	validNames = []
+	stopWords = loadStopWords()
+	for r in result:
+		if isValid(r, stopWords):
+			validNames.append(r)
+	return validNames
 
 if __name__=="__main__":
 	import doctest
 	doctest.testmod()
+
+answer("who is spiderman")
