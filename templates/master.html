@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	{% block head %}
+	<title></title>
+	
+	<!-- Stylesheets -->
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+	
+	<!-- Bootstrap from MaxCDN -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	{% endblock %}
+</head>
+
+<body>
+	<!-- Fixed navbar -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="/">NAME</a>
+			</div>
+			<div>
+				<!-- List of tabs (href, id, caption) -->
+				{% set navigation_bar = [
+				    ('/', 'index', 'Home'),
+				    ('/about', 'about', 'About')
+				] -%}
+				{% set active_page = active_page|default('index') -%}
+				...
+				<ul class="nav navbar-nav">
+				{% for href, id, caption in navigation_bar %}
+				    <li{% if id == active_page %} class="active"{% endif %}>
+				    	<a href="{{ href|e }}">{{ caption|e }}</a>
+				    </li>
+				{% endfor %}
+				</ul>
+				...
+			</div>
+		</div>
+	</nav>
+		
+	<!-- Page content -->
+	<div class="container">{% block content %}{% endblock %}</div>
+	
+</body>
+
+</html>

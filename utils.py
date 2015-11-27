@@ -5,11 +5,11 @@ def findPages(q, numPages=10):
 	"""
 	Returns a list of pages related to query string by Google search.
 	"""
-	pages = google.search(q,num=numPages,start=0,stop=numPages)
+	pages = google.search(q,num=10,start=0,stop=numPages)
 	plist = []
 	for r in pages:
 		plist.append(r)
-	return plist
+	return plist[:numPages]
 
 def getText(link):
 	"""
@@ -23,31 +23,24 @@ def getText(link):
 	text = re.sub("[\t\n ]+",' ',raw)
 	return text
 
-def countListItems(L, dict):
+def countListItems(L, dicts):
 	"""
-	Returns a dictionary of list items and how many times they appear in the list.
-
-	>>> countListItems(["cat", "dog", "bird", "cat", "bird"], {})
-	{'bird': 2, 'dog': 1, 'cat': 2}
-
-	>>> countListItems(["blue", "green"], {"black": 2, "blue": 1})
-	{'blue': 2, 'green': 1, 'black': 2}
+	Returns a list of dictionaries of list items and how many times they appear in the list.
 	"""
 	for i in L:
-		if i in dict.keys():
-			dict[i] += 1
-                        print "counted one"
+		ind = ord(i[0].upper()) - 65  
+		if i in dicts[ind].keys():
+			dicts[ind][i] += 1
 		else:
-			dict[i] = 1
-                        print "counted one"
-	return dict
+			dicts[ind][i] = 1
+	return dicts
 
 def maxCountItem(dict):
 	"""
 	Returns dictionary item with greatest count.
 
 	>>> maxCountItem({'john': 3, 'sally': 10, 'jack': 4})
-	'sally'
+	['sally', 10]
 	"""
 	maxCount = 0
 	maxItem = ""
@@ -55,6 +48,17 @@ def maxCountItem(dict):
 		if dict[i] > maxCount:
 			maxItem = i
 			maxCount = dict[i]
+	return [maxItem, maxCount]
+
+def maxCountList(dicts):
+	maxCount = 0
+	maxItem = ""
+	for d in dicts:
+		if d != {}:
+			mc = maxCountItem(d)
+			if mc[1] > maxCount:
+				maxItem = mc[0]
+				maxCount = mc[1]
 	return maxItem
 
 #something that determines what we need to find (person, place, etc)
@@ -62,20 +66,37 @@ def answer(q):
 	"""
 	Returns an answer to a string query.
 	"""
-	pages = findPages(q)[1:2]
-	print "found pages"
-	a = {}
+	pages = findPages(q, 5)
+	total = len(pages)
+	a = [{} for i in range(26)]
 	if 'who' in q.lower():
+		pnum = 1
 		for p in pages:
+			print "("+str(pnum)+"/"+str(total)+") "+p
 			text = getText(p)
-			print "got text"
 			countListItems(findNames(text), a) 
-			print "items counted"
-			print "done"
-		ans = maxCountItem(a) 
+			pnum += 1
+		ans = maxCountList(a) 
 		print ans
 		return ans
 	return ""
+
+def isValid(check, stopWords):
+	"""
+	>>> isValid("The Amazing", ["a", "an", "the"])
+	False
+	"""
+	parts = [i.lower() for i in check.split(" ")]
+	for p in parts:
+		if p in stopWords:
+			return False
+	return True
+
+def loadStopWords():
+	file = "stopWords.txt"
+	f = open(file)
+	words = [line.strip() for line in f]
+	return words
 
 ############ Find a person. ############
 
@@ -88,9 +109,6 @@ def findNames(text):
 
 	>>> findNames("Peter Parker was an orphan raised by his Uncle Ben and Aunt May; Peter Parker was inspired by his uncle's death.")
 	['Peter Parker', 'Uncle Ben', 'Aunt May', 'Peter Parker']
-
-	>>> findNames("The Amazing Spider-Man was a movie featuring Peter Parker.")
-	['Peter Parker']
 	"""
 	pattern = "[A-Z]\w+[ ][A-Z]\w+"  # 2 capitalized words together
 	result = re.findall(pattern, text)
@@ -101,7 +119,8 @@ def findNames(text):
 			result.pop(i)
 			num -= 1
 	return result
-
 if __name__=="__main__":
 	import doctest
 	doctest.testmod()
+
+answer("who sang hello")
