@@ -126,4 +126,4 @@ if __name__=="__main__":
 	import doctest
 	doctest.testmod()
 
-answer("who is spiderman")
+answer("who sings hello")
