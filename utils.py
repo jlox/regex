@@ -40,20 +40,27 @@ def countListItems(L, dicts):
 
 def maxCountItem(dict):
 	"""
-	Returns dictionary item with greatest count.
+	Returns dictionary item with greatest count and its count in a list.
 
 	>>> maxCountItem({'john': 3, 'sally': 10, 'jack': 4})
 	['sally', 10]
 	"""
 	maxCount = 0
 	maxItem = ""
+	stopWords = loadStopWords()
 	for i in dict.keys():
-		if dict[i] > maxCount:
+		if dict[i] > maxCount and isValid(i, stopWords):
 			maxItem = i
 			maxCount = dict[i]
 	return [maxItem, maxCount]
 
 def maxCountList(dicts):
+	"""
+	Returns dictionary item with greatest count from a list of dictionaries.
+
+	>>> maxCountList([{'bob': 2, 'barry': 5}, {'dan': 4, 'david': 1}])
+	'barry'
+	"""
 	maxCount = 0
 	maxItem = ""
 	for d in dicts:
@@ -86,6 +93,8 @@ def answer(q):
 
 def isValid(check, stopWords):
 	"""
+	Returns true if string does not contain any stop words, and false otherwise.
+
 	>>> isValid("The Amazing", ["a", "an", "the"])
 	False
 	"""
@@ -115,15 +124,8 @@ def findNames(text):
 	"""
 	pattern = "[A-Z]\w+[ ][A-Z]\w+"  # 2 capitalized words together
 	result = re.findall(pattern, text)
-	validNames = []
-	stopWords = loadStopWords()
-	for r in result:
-		if isValid(r, stopWords):
-			validNames.append(r)
-	return validNames
+	return result
 
 if __name__=="__main__":
 	import doctest
 	doctest.testmod()
-
-answer("who sings hello")

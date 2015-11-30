@@ -1,0 +1,34 @@
+{% extends "master.html" %}
+{% set active_page = "about" %}
+
+{% block head %}
+	{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+<h1 class="text-center"> Regex </h1>
+
+<h2> Team Members </h2>
+<p>Ariel Levy</p>
+<p>Jeanne Locker</p>
+
+<h2> Description </h2>
+
+<p>The project answers a question with the word "who". It can take up to several minutes to answer!</p> 
+
+<p><b>Sample questions that worked:</b></p>
+
+<p>
+"Who sang Hello?"  
+Lionel Richie
+</p>
+
+<p>
+"Who is the lead singer of Maroon 5?"  
+Adam Levine
+</p>
+
+</div>
+{% endblock %}
